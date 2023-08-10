@@ -10,16 +10,10 @@ import {
   View,
 } from 'react-native'
 
-import SimpleMarkdown from 'simple-markdown'
+import SimpleMarkdown from '@khanacademy/simple-markdown'
 
 import DefaultRenders from './renders'
 import DefaultStyles from './styles'
-
-import type {
-  ImageNode,
-  Rules,
-  Styles,
-} from './types'
 
 function simpleMarkdownRule(rule, styles) {
   const {render, ...properties} = rule
@@ -52,7 +46,7 @@ const IMAGE_SIZE = "(?:\\s+=([0-9]+)?x([0-9]+)?)?\\)\\s*"
 const inlineRegex = (regex) => ((source, state) => state.inline ? regex.exec(source) : null)
 const unescapeUrl = (url) => url.replace(/\\([^0-9A-Za-z\s])/g, '$1')
 
-const DefaultRules : Rules = Object.freeze(mergeRules(
+const DefaultRules = Object.freeze(mergeRules(
   Object.assign(
     {},
     ...Object.entries(DefaultRenders).map(([nodeKey, render]) => ({[nodeKey]: {render: render}}))
@@ -63,7 +57,7 @@ const DefaultRules : Rules = Object.freeze(mergeRules(
     },
     image: {
       match: inlineRegex(new RegExp("^!\\[(" + IMAGE_LINK + ")\\]\\(" + IMAGE_HREF_AND_TITLE + IMAGE_SIZE)),
-      parse: (capture, parse, state): ImageNode => ({
+      parse: (capture, parse, state) => ({
         alt: capture[1],
         target: unescapeUrl(capture[2]),
         title: capture[3],
@@ -75,14 +69,6 @@ const DefaultRules : Rules = Object.freeze(mergeRules(
 ))
 
 class MarkdownView extends Component {
-  props: {
-    style?: Object,
-    rules?: Rules,
-    onLinkPress?: (string) => void,
-    styles?: Styles,
-    children: string,
-  }
-
   render() {
     const {rules = {}, styles = {}, onLinkPress} = this.props
 

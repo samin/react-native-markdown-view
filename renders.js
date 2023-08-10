@@ -14,20 +14,8 @@ import {
   Row,
 } from 'react-native-tabular-grid-markdown-view'
 
-import type {
-  EmptyNode,
-  HeadingNode,
-  ImageNode,
-  InlineContentNode,
-  LinkNode,
-  ListNode,
-  TableNode,
-  OutputFunction,
-  RenderState,
-  RenderStyles,
-} from './types'
 
-function renderImage(node: ImageNode, output: OutputFunction, state: RenderState, styles: RenderStyles) {
+function renderImage(node, output, state, styles) {
   const {imageWrapper: wrapperStyle, image: imageStyle} = styles
   return (
     <View key={state.key} style={node.width || node.height ? [wrapperStyle, paddedSize(node, wrapperStyle)] : wrapperStyle}>
@@ -79,9 +67,9 @@ function renderTableCell(cell, row, column, rowCount, columnCount, output, state
 function paragraphRenderer() {
   var renderText = textContentRenderer('paragraph')
 
-  return (node: InlineContentNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => {
+  return (node, output, state, styles) => {
     if (node.content instanceof Array && node.content.length === 1 && node.content[0].type === 'image') {
-      const imageNode : ImageNode = node.content[0]
+      const imageNode = node.content[0]
       return renderImage(imageNode, output, state, styles)
     } else {
       return renderText(node, output, state, styles)
@@ -90,7 +78,7 @@ function paragraphRenderer() {
 }
 
 function textContentRenderer(styleName, styleName2) {
-  return (node: InlineContentNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  return (node, output, state, styles) => (
     <Text key={state.key} style={styleName2 ? [styles[styleName], styles[styleName2]] : styles[styleName]}>
       {typeof node.content === 'string' ? node.content : output(node.content, state)}
     </Text>
@@ -118,7 +106,7 @@ function paddedSize(size, style) {
 
 export default Object.freeze({
   blockQuote: textContentRenderer('blockQuote'),
-  br: (node: EmptyNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  br: (node, output, state, styles) => (
     <Text key={state.key} style={styles.br}>
       {'\n\n'}
     </Text>
@@ -126,21 +114,21 @@ export default Object.freeze({
   codeBlock: textContentRenderer('codeBlock'),
   del: textContentRenderer('del'),
   em: textContentRenderer('em'),
-  heading: (node: HeadingNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  heading: (node, output, state, styles) => (
     textContentRenderer('heading', 'heading' + node.level)(node, output, state, styles)
   ),
-  hr: (node: EmptyNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  hr: (node, output, state, styles) => (
     <View key={state.key} style={styles.hr}/>
   ),
   image: renderImage,
   inlineCode: textContentRenderer('inlineCode'),
-  link: (node: LinkNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => {
+  link: (node, output, state, styles) => {
     const onPress = state.onLinkPress
     return <Text key={state.key} style={styles.link} onPress={onPress ? () => onPress(node.target) : null}>
       {typeof node.content === 'string' ? node.content : output(node.content, state)}
     </Text>
   },
-  list: (node: ListNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  list: (node, output, state, styles) => (
     <View key={state.key} style={styles.list}>
       {node.items.map((item, i) => (
         <View key={i} style={styles.listItem}>
@@ -159,14 +147,14 @@ export default Object.freeze({
       ))}
     </View>
   ),
-  newline: (node: EmptyNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  newline: (node, output, state, styles) => (
     <Text key={state.key} style={styles.newline}>
       {'\n'}
     </Text>
   ),
   paragraph: paragraphRenderer(),
   strong: textContentRenderer('strong'),
-  table: (node: TableNode, output: OutputFunction, state: RenderState, styles: RenderStyles) => (
+  table: (node, output, state, styles) => (
     <Grid key={state.key} style={styles.table}>
       {[<Row id={1} key={1}>
         {node.header.map((cell, column) => renderTableCell(cell, 1, column + 1, node.cells.length + 1, node.header.length, output, state, styles))}
